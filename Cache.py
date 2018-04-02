@@ -9,5 +9,4 @@ DB_Session = sessionmaker(bind=engine)
 session = DB_Session()
 BaseModel = declarative_base()
 
-
-#BaseModel.metadata.create_all(engine)
+BaseModel.metadata.create_all(engine)

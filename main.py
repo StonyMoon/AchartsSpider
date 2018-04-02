@@ -24,7 +24,9 @@ def get_info(song_id):
     url = 'https://acharts.co/song/' + song_id
     soup = pyquery.PyQuery(req.get(url).text)
     authors = [x.text() for x in soup('.ArtistSpace').items()]
-    print(authors)
+    for each in authors:
+        session.add(Songtosinger())
+        get_singer(each)
 
 
 def get_board(year, week):
@@ -38,14 +40,14 @@ def get_board(year, week):
         rank = int(each('[itemprop=position]').text())
         [previous, peak, weeks] = each('.cStats').text().split(' ')
         b = Billboard(previous,weeks,peak,rank,date=date)
-        t_songonbillboard.append_column()
-        session.add(b)
-        session.commit()
-
         song_name = each('[itemprop=name]').html()
         song_url = each('a').attr('href')
         song_id = song_url.split('/')[-1]
-        #get_info(song_id)
+        session.add(Songonbillboard(songId=song_id, billboardDate=date, billboardRank=rank))
+        session.add(b)
+        session.add(Song(song_id, song_name))
+        session.commit()
+        get_info(song_id)
 
 
 def get_singer(name):
@@ -62,6 +64,10 @@ def get_singer(name):
     type = info_list[0].replace('Person ', '').replace('(', '').replace(')', '')
     area = info_list[1].replace('Area: ', '')
     born = info_list[2].replace('Founded: ', '').replace('Born: ', '')
+    session.add(Singer())
+
+    session.commit()
+
     print(type, area, born, image_url, des)
 
 

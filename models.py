@@ -1,7 +1,6 @@
 # coding: utf-8
-from sqlalchemy import Column, Date, DateTime, Index, Integer, String, Table, Text
+from sqlalchemy import Column, Date, DateTime, Index, Integer, String, Text
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
 
 
 Base = declarative_base()
@@ -9,21 +8,18 @@ metadata = Base.metadata
 
 
 class Billboard(Base):
+    __tablename__ = 'billboard'
+    __table_args__ = (
+        Index('rank', 'rank', 'date'),
+    )
 
-
-    def __init__(self,pre,weeks,peak,rank,date):
-        self.previous =pre
+    def __init__(self, previous, weeks, peak, rank, date):
+        self.previous = previous
         self.weeks = weeks
         self.peak = peak
         self.rank = rank
         self.date = date
 
-
-    __tablename__ = 'billboard'
-    __table_args__ = (
-        Index('rank', 'rank', 'date'),
-    )
-    songs = relationship('Song', secondary=t_songonbillboard)
     previous = Column(Integer)
     weeks = Column(Integer)
     peak = Column(Integer)
@@ -44,21 +40,33 @@ class Singer(Base):
 class Song(Base):
     __tablename__ = 'song'
 
+    def __init__(self, id, title):
+        self.id = id
+        self.title = title
+
     id = Column(Integer, primary_key=True)
     title = Column(String(255))
-    billboards = relationship('Billboard', secondary=t_songonbillboard)
-
-t_songonbillboard = Table(
-    'songonbillboard', metadata,
-    Column('songId', Integer, index=True),
-    Column('billboardDate', DateTime),
-    Column('billboardRank', Integer),
-    Index('billboardRank', 'billboardRank', 'billboardDate')
-)
 
 
-t_songtosinger = Table(
-    'songtosinger', metadata,
-    Column('songId', Integer, index=True),
-    Column('singerName', String(255), index=True)
-)
+class Songonbillboard(Base):
+    __tablename__ = 'songonbillboard'
+    __table_args__ = (
+        Index('billboardRank', 'billboardRank', 'billboardDate'),
+    )
+
+    id = Column(Integer, primary_key=True)
+    songId = Column(Integer, index=True)
+    billboardDate = Column(DateTime)
+    billboardRank = Column(Integer)
+
+
+class Songtosinger(Base):
+    __tablename__ = 'songtosinger'
+
+    def __init__(self, songId, singerName):
+        self.songId = songId
+        self.singerName = singerName
+
+    id = Column(Integer, primary_key=True)
+    songId = Column(Integer, index=True)
+    singerName = Column(String(255), index=True)
