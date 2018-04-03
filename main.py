@@ -25,7 +25,9 @@ def get_info(song_id):
     soup = pyquery.PyQuery(req.get(url).text)
     authors = [x.text() for x in soup('.ArtistSpace').items()]
     for each in authors:
-        session.add(Songtosinger())
+        if session.query(Songtosinger).filter_by(songId=song_id, singerName=each).first():
+            return
+        session.add(Songtosinger(song_id, each))
         get_singer(each)
 
 
@@ -39,13 +41,17 @@ def get_board(year, week):
     for each in soup.items():
         rank = int(each('[itemprop=position]').text())
         [previous, peak, weeks] = each('.cStats').text().split(' ')
-        b = Billboard(previous,weeks,peak,rank,date=date)
+        if previous == 'new':
+            previous = None
+        billboard_item = Billboard(previous, weeks, peak, rank, date=date)
         song_name = each('[itemprop=name]').html()
         song_url = each('a').attr('href')
         song_id = song_url.split('/')[-1]
+
         session.add(Songonbillboard(songId=song_id, billboardDate=date, billboardRank=rank))
-        session.add(b)
-        session.add(Song(song_id, song_name))
+        session.add(billboard_item)
+        if session.query(Song).filter_by(id=song_id).first() is None:
+            session.add(Song(song_id, song_name))
         session.commit()
         get_info(song_id)
 
@@ -64,11 +70,10 @@ def get_singer(name):
     type = info_list[0].replace('Person ', '').replace('(', '').replace(')', '')
     area = info_list[1].replace('Area: ', '')
     born = info_list[2].replace('Founded: ', '').replace('Born: ', '')
-    session.add(Singer())
-
+    if session.query(Singer).filter_by(name=name).first():
+        return
+    session.add(Singer(name=name, image=image_url, info=des, area=area, born=born))
     session.commit()
-
-    print(type, area, born, image_url, des)
 
 
 get_board(2018,5)
