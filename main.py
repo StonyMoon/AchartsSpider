@@ -35,9 +35,12 @@ def get_board(year, week):
     url = 'https://acharts.co/us_singles_top_100/%s/%s' % (year, week)
     re = req.get(url).text
     soup = pyquery.PyQuery(re)
+    next_page = soup('#st-container > div > div > header > div.title > h2:nth-child(3) > a').attr('href') \
+        .split('/')
+    next_year = int(next_page[2])
+    next_week = int(next_page[3])
     date = soup('[itemprop=datePublished]').attr('datetime')
     soup = soup('#ChartTable tbody tr')
-
     for each in soup.items():
         rank = int(each('[itemprop=position]').text())
         [previous, peak, weeks] = each('.cStats').text().split(' ')
@@ -60,6 +63,8 @@ def get_board(year, week):
             session.add(Song(song_id, song_name))
             session.commit()
         get_song_info(song_id)
+    print(next_year, next_week)
+    get_board(next_year, next_week)
 
 
 def get_singer(name, singer_url):
@@ -100,5 +105,5 @@ def get_singer(name, singer_url):
     session.commit()
 
 
-get_board(2018,5)
+get_board(2018, 14)
 #get_info('112140')
