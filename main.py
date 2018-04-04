@@ -16,7 +16,10 @@ def get_rank(song_id, chart):
     for e in re:
         print(int(e[2]))
 
-def get_info(song_id):
+
+def get_song_info(song_id):
+    if session.query(Song).filter_by(id=song_id).first():
+        return
     url = 'https://acharts.co/song/' + song_id
     soup = pyquery.PyQuery(req.get(url).text)
     singers_name = [x.text() for x in soup('.ArtistSpace').items()]
@@ -56,7 +59,7 @@ def get_board(year, week):
         if session.query(Song).filter_by(id=song_id).first() is None:
             session.add(Song(song_id, song_name))
             session.commit()
-        get_info(song_id)
+        get_song_info(song_id)
 
 
 def get_singer(name, singer_url):
