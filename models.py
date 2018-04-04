@@ -30,10 +30,12 @@ class Billboard(Base):
 class Singer(Base):
     __tablename__ = 'singer'
 
-    name = Column(String(255), primary_key=True)
+    url = Column(String(255), primary_key=True)
     image = Column(String(255))
+    name = Column(String(255))
     info = Column(Text)
     area = Column(String(255))
+    type = Column(String(255))
     born = Column(Date)
 
 
