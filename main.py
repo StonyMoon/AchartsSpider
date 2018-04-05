@@ -17,7 +17,7 @@ def get_rank(song_id, chart):
         print(int(e[2]))
 
 
-def get_song_info(song_id):
+def get_song_info(song_id, song_name):
     if session.query(Song).filter_by(id=song_id).first():
         return
     url = 'https://acharts.co/song/' + song_id
@@ -29,6 +29,8 @@ def get_song_info(song_id):
             return
         session.add(Songtosinger(song_id, each[1]))
         get_singer(each[0], each[1])
+    session.add(Song(song_id, song_name))
+    session.commit()
 
 
 def get_board(year, week):
@@ -46,12 +48,13 @@ def get_board(year, week):
         [previous, peak, weeks] = each('.cStats').text().split(' ')
         if previous == 'new':
             previous = None
+        elif previous == 're-entry':
+            previous = 101
         if session.query(Billboard).filter_by(date=date, rank=rank).first() \
                 is None:
             billboard_item = Billboard(previous, weeks, peak, rank, date=date)
             session.add(billboard_item)
             session.commit()
-
         song_name = each('[itemprop=name]').html()
         song_url = each('a').attr('href')
         song_id = song_url.split('/')[-1]
@@ -59,10 +62,8 @@ def get_board(year, week):
                 is None:
             session.add(Songonbillboard(songId=song_id, billboardDate=date, billboardRank=rank))
             session.commit()
-        if session.query(Song).filter_by(id=song_id).first() is None:
-            session.add(Song(song_id, song_name))
-            session.commit()
-        get_song_info(song_id)
+
+        get_song_info(song_id, song_name)
     print(next_year, next_week)
     get_board(next_year, next_week)
 
@@ -98,12 +99,10 @@ def get_singer(name, singer_url):
             area = each.replace('Area: ', '')
         elif 'Born' in each:
             born = each.replace('Founded: ', '').replace('Born: ', '')
-
-    if session.query(Singer).filter_by(name=name).first():
-        return
+    print('歌手', name)
     session.add(Singer(type=type, url=singer_url, name=name, image=image_url, info=des, area=area, born=born))
     session.commit()
 
 
-get_board(2018, 14)
+get_board(2005, 24)
 #get_info('112140')
