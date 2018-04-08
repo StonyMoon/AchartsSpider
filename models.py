@@ -1,7 +1,7 @@
 # coding: utf-8
 from sqlalchemy import Column, Date, DateTime, Index, Integer, String, Text
 from sqlalchemy.ext.declarative import declarative_base
-
+from Cache import engine
 
 Base = declarative_base()
 metadata = Base.metadata
@@ -20,6 +20,7 @@ class Billboard(Base):
         self.rank = rank
         self.date = date
 
+
     previous = Column(Integer)
     weeks = Column(Integer)
     peak = Column(Integer)
@@ -31,6 +32,7 @@ class Singer(Base):
     __tablename__ = 'singer'
 
     url = Column(String(255), primary_key=True)
+    id = Column(Integer)
     image = Column(String(255))
     name = Column(String(255))
     info = Column(Text)
@@ -72,3 +74,5 @@ class Songtosinger(Base):
     id = Column(Integer, primary_key=True)
     songId = Column(Integer, index=True)
     singerName = Column(String(255), index=True)
+
+    # Base.metadata.create_all(engine)

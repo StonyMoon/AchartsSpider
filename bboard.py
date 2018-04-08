@@ -12,7 +12,7 @@ db = SQLAlchemy(app)
 auth = HTTPAuth(app)
 
 app.config['SECRET_KEY'] = 'StonyMoon'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@127.0.0.1/bb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@127.0.0.1/bbc'
 
 db.create_all()
 

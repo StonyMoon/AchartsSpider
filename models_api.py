@@ -10,21 +10,31 @@ Text = db.Text
 Date = db.Date
 Index = db.Index
 
+
+class TimeItem(fields.Raw):
+    def format(self, value):
+        return str(value.year) + '-' + str(value.month) + '-' + str(value.day)
+
+
+class RankItem(fields.Raw):
+    def format(self, value):
+        l = [x.rank for x in value]
+        return l
+
+
+
 song_singer = db.Table('song_singer', db.Model.metadata,
                        db.Column('song_id', db.Integer, db.ForeignKey('song.id')),
-                       db.Column('singer_url', db.String(255), db.ForeignKey('singer.url'))
+                       db.Column('singer_id', db.Integer, db.ForeignKey('singer.id'))
                        )
 
-song_billboard = db.Table('song_billboard', db.Model.metadata,
-                          db.Column('song_id', db.Integer, db.ForeignKey('song.id')),
-                          db.Column('billboard_id', db.Integer, db.ForeignKey('billboard.id')),
-                          )
+
 
 
 class Billboard(db.Model):
     __tablename__ = 'billboard'
     __table_args__ = (
-        Index('rank', 'rank', 'date'),
+        Index('rank', 'date', 'song_id'),
     )
     # id计算：180613 100名次
     id = Column(Integer, primary_key=True)
@@ -33,29 +43,21 @@ class Billboard(db.Model):
     peak = Column(Integer)
     rank = Column(Integer, nullable=False)
     date = Column(DateTime, nullable=False)
-    songs = db.relationship('Song', secondary=song_billboard)
+    song_id = db.Column('song_id', db.Integer, db.ForeignKey('song.id'))
+
 
 
 class Singer(db.Model):
     __tablename__ = 'singer'
 
-    url = Column(String(255), primary_key=True)
+    id = Column(Integer, primary_key=True)
     image = Column(String(255))
     name = Column(String(255))
     info = Column(Text)
     area = Column(String(255))
     type = Column(String(255))
-    born = Column(Date)
+    born = Column(DateTime)
     songs = db.relationship('Song', secondary=song_singer)
-
-    fields = {
-        'image': fields.Integer,
-        'name': fields.String,
-        'info': fields.String,
-        'area': fields.String,
-        'type': fields.String,
-        'born': fields.DateTime
-    }
 
 
 class Song(db.Model):
@@ -63,15 +65,63 @@ class Song(db.Model):
 
     id = Column(Integer, primary_key=True)
     title = Column(String(255))
-    billboards = db.relationship('Billboard', secondary=song_billboard)
     singers = db.relationship('Singer', secondary=song_singer)
 
     def __repr__(self):
         return self.title
 
 
+song_simple_field = {
+    'id': fields.Integer,
+    'title': fields.String
+}
+
+singer_name_fields = {
+    'name': fields.String,
+    'id': fields.Integer
+}
+
+billboard_fields = {
+    'previous': fields.Integer,
+    'weeks': fields.Integer,
+    'peak': fields.Integer,
+    'rank': fields.Integer,
+    'songs': song_simple_field
+}
+
+singer_profile_fields = {
+    'id': fields.Integer,
+    'image': fields.String,
+    'name': fields.String,
+    'info': fields.String,
+    'area': fields.String,
+    'type': fields.String,
+    'born': TimeItem()
+}
+
+singer_fields = {
+    'image': fields.String,
+    'name': fields.String,
+    'info': fields.String,
+    'area': fields.String,
+    'type': fields.String,
+    'born': TimeItem(),
+    'songs': fields.List(fields.Nested(song_simple_field))
+}
+
+song_with_singer_field = {
+    'id': fields.Integer,
+    'title': fields.String,
+    'singers': fields.List(fields.Nested(singer_name_fields))
+
+}
+
+song_fields = {
+    'id': fields.Integer,
+    'title': fields.String,
+    'ranks': RankItem(attribute='billboards'),
+    'singers': fields.List(fields.Nested(singer_profile_fields))
+}
+
 if __name__ == '__main__':
     db.create_all()
-    # a = db.session.query(Singer).filter_by(song='drake').first()
-    # for each in a.songs:
-    #     print(each)

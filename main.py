@@ -4,6 +4,7 @@ import pyquery
 from Cache import session
 from models import *
 
+
 def get_rank(song_id, chart):
     url = 'https://acharts.co/callback/GraphData'
     data = {
@@ -97,12 +98,15 @@ def get_singer(name, singer_url):
             type = each.replace('Person ', '').replace('(', '').replace(')', '')
         elif 'Area' in each:
             area = each.replace('Area: ', '')
-        elif 'Born' in each:
+        elif 'Born' in each and each.count('-') == 2:
             born = each.replace('Founded: ', '').replace('Born: ', '')
     print('歌手', name)
     session.add(Singer(type=type, url=singer_url, name=name, image=image_url, info=des, area=area, born=born))
     session.commit()
 
 
-get_board(2005, 24)
+get_board(2018, 14)
+
+
+
 #get_info('112140')
