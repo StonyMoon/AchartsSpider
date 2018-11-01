@@ -1,8 +1,8 @@
-from Cache import session
-from models import Song, Singer, Billboard, Songonbillboard, Songtosinger
-from models_api import Song as ApiSong, Singer as ApiSinger, Billboard as ApiBillboard
-
 from bboard import db
+from models_api import Billboard as ApiBillboard
+
+from db.Cache import session
+from spider.models import Billboard, Songonbillboard
 
 # songs = session.query(Song).all()
 # for each in songs:
@@ -50,4 +50,3 @@ for each in billboards:
 #         each.singers.append(s)
 #         db.session.add(each)
 # db.session.commit()
-        #

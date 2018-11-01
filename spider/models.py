@@ -1,7 +1,6 @@
 # coding: utf-8
 from sqlalchemy import Column, Date, DateTime, Index, Integer, String, Text
 from sqlalchemy.ext.declarative import declarative_base
-from Cache import engine
 
 Base = declarative_base()
 metadata = Base.metadata

@@ -1,23 +1,14 @@
-import requests as req
+# 把爬虫爬取到数据库中
 import json
+
 import pyquery
-from Cache import session
-from models import *
+import requests as req
+
+from db.Cache import session
+from spider.models import *
 
 
-def get_rank(song_id, chart):
-    url = 'https://acharts.co/callback/GraphData'
-    data = {
-        'titleid': song_id,
-        "chart": chart,
-        "initiator": ' automatic_first'
-    }
-    re = req.post(url, data).text
-    re = json.loads(re)['data']['data']
-    for e in re:
-        print(int(e[2]))
-
-
+# 通过歌曲 id 来获取歌曲信息
 def get_song_info(song_id, song_name):
     if session.query(Song).filter_by(id=song_id).first():
         return
@@ -34,6 +25,7 @@ def get_song_info(song_id, song_name):
     session.commit()
 
 
+# 参数年份 月份
 def get_board(year, week):
     url = 'https://acharts.co/us_singles_top_100/%s/%s' % (year, week)
     re = req.get(url).text
