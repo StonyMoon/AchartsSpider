@@ -1,9 +1,25 @@
 # 把爬虫爬取到数据库中
 
 import pyquery
-import requests as req
+import requests
 
 from db.models import *
+
+
+def get(url, try_time=2):
+    # 设置请求头
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"
+    }
+    try:
+        re = requests.get(url, headers=headers)
+    except Exception:
+        if try_time > 0:
+            return get(url, try_time - 1)
+        print('网页:', url, '抓取失败')
+        return None
+    else:
+        return re.text
 
 
 # 通过歌曲 id 来获取歌曲信息
@@ -12,7 +28,7 @@ def get_song_info(song_id, song_name):
     if session.query(Song).filter_by(id=song_id).first():
         return
     url = 'https://acharts.co/song/' + song_id
-    soup = pyquery.PyQuery(req.get(url).text)
+    soup = pyquery.PyQuery(get(url))
     singers_name = [x.text() for x in soup('.ArtistSpace').items()]
     singers_url = [x.attr('href').split('/')[2] for x in soup('.ArtistSpace a').items()]
     for each in zip(singers_name, singers_url):
@@ -28,7 +44,7 @@ def get_song_info(song_id, song_name):
 def get_board(year, week):
     print('开始爬取', year, week)
     url = 'https://acharts.co/us_singles_top_100/%s/%s' % (year, week)
-    re = req.get(url).text
+    re = get(url)
     soup = pyquery.PyQuery(re)
     next_page = soup('#st-container > div > div > header > div.title > h2:nth-child(3) > a').attr('href') \
         .split('/')
@@ -66,7 +82,7 @@ def get_singer(name, singer_url):
     if session.query(Singer).filter_by(url=singer_url).first():
         return
     url = 'https://acharts.co/artist/' + singer_url
-    re = req.get(url).text
+    re = get(url)
     soup = pyquery.PyQuery(re)
     image_url = soup('.ArtworkSlide').attr('content')
     des = soup('[itemprop=description]').text()
@@ -97,11 +113,12 @@ def get_singer(name, singer_url):
     session.commit()
 
 
-def schedule():
-    for year in range(15):
-        for i in range(0, 54):
-            print(2018 - year, 54 - i)
-            get_board(2018 - year, 54 - i)
+# def schedule():
+#     for year in range(15):
+#         for i in range(0, 54):
+#             print(2018 - year, 54 - i)
+#             get_board(2018 - year, 54 - i)
 
 
-schedule()
+# schedule()
+get_board(2018, 44)
