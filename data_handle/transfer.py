@@ -1,22 +1,21 @@
-from bboard import db
-from models_api import Billboard as ApiBillboard
+from db.api_models import session as api_session
+from db.api_models import Billboard as ApiBillboard
+from db.api_models import Singer as ApiSinger, Song as ApiSong
+from db.models import session
+from db.models import Billboard, Songonbillboard, Song, Singer, Songtosinger
 
-from db.Cache import session
-from spider.models import Billboard, Songonbillboard
+songs = session.query(Song).all()
+for each in songs:
+    api_session.add(ApiSong(id=each.id, title=each.title))
+api_session.commit()
 
-# songs = session.query(Song).all()
-# for each in songs:
-#     db.session.add(ApiSong(id=each.id,title=each.title))
-# db.session.commit()
-
-
-# i = 0
-# singers = session.query(Singer).all()
-# for each in singers:
-#     db.session.add(ApiSinger(id=i,image=each.image,name=each.name,
-#                              info=each.info,area=each.area,type=each.type,born=each.born))
-#     i+=1
-# db.session.commit()
+i = 0
+singers = session.query(Singer).all()
+for each in singers:
+    api_session.add(ApiSinger(id=i, image=each.image, name=each.name,
+                              info=each.info, area=each.area, type=each.type, born=each.born))
+    i += 1
+api_session.commit()
 
 
 billboards = session.query(Billboard).all()
@@ -29,24 +28,23 @@ for each in billboards:
     d = billboard_date.day * 10e2
     id = int(each.rank + y + m + d)
     try:
-        db.session.add(ApiBillboard(id=id, previous=each.previous,
-                                    weeks=each.weeks, peak=each.peak,
-                                    rank=each.rank, date=each.date, song_id=song_id,
-                                    ))
-        db.session.commit()
+        api_session.add(ApiBillboard(id=id, previous=each.previous,
+                                     weeks=each.weeks, peak=each.peak,
+                                     rank=each.rank, date=each.date, song_id=song_id,
+                                     ))
+        api_session.commit()
     except Exception:
-        db.session.rollback()
+        api_session.rollback()
 
+singer_song = session.query(Songtosinger).all()
 
-# singer_song = session.query(Songtosinger).all()
-        #
-# songs = db.session.query(ApiSong).all()
-#
-# for each in songs:
-#     singer_song = session.query(Songtosinger).filter_by(songId=each.id).all()
-#     for singer in singer_song:
-        #         ss = session.query(Singer).filter_by(url=singer.singerName).first()
-        #         s = db.session.query(ApiSinger).filter_by(name=ss.name,area=ss.area,type=ss.type,born=ss.born).first()
-#         each.singers.append(s)
-#         db.session.add(each)
-# db.session.commit()
+songs = api_session.query(ApiSong).all()
+
+for each in songs:
+    singer_song = session.query(Songtosinger).filter_by(songId=each.id).all()
+    for singer in singer_song:
+        ss = session.query(Singer).filter_by(url=singer.singerName).first()
+        s = api_session.query(ApiSinger).filter_by(name=ss.name, area=ss.area, type=ss.type, born=ss.born).first()
+        each.singers.append(s)
+        api_session.add(each)
+api_session.commit()

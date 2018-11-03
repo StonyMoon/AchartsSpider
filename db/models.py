@@ -1,7 +1,16 @@
 # coding: utf-8
 from sqlalchemy import Column, Date, DateTime, Index, Integer, String, Text
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
+DB_CONNECT_STRING = 'mysql+pymysql://root:root@localhost/cache_dev?charset=utf8'
+engine = create_engine(DB_CONNECT_STRING, echo=False)
+DB_Session = sessionmaker(bind=engine)
+session = DB_Session()
+BaseModel = declarative_base()
+
+BaseModel.metadata.create_all(engine)
 Base = declarative_base()
 metadata = Base.metadata
 
@@ -74,4 +83,6 @@ class Songtosinger(Base):
     songId = Column(Integer, index=True)
     singerName = Column(String(255), index=True)
 
-    # Base.metadata.create_all(engine)
+
+if __name__ == '__main__':
+    Base.metadata.create_all(engine)

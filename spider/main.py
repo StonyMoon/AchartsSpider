@@ -1,15 +1,14 @@
 # 把爬虫爬取到数据库中
-import json
 
 import pyquery
 import requests as req
 
-from db.Cache import session
-from spider.models import *
+from db.models import *
 
 
 # 通过歌曲 id 来获取歌曲信息
 def get_song_info(song_id, song_name):
+    print('爬取歌曲信息', song_name)
     if session.query(Song).filter_by(id=song_id).first():
         return
     url = 'https://acharts.co/song/' + song_id
@@ -27,6 +26,7 @@ def get_song_info(song_id, song_name):
 
 # 参数年份 月份
 def get_board(year, week):
+    print('开始爬取', year, week)
     url = 'https://acharts.co/us_singles_top_100/%s/%s' % (year, week)
     re = req.get(url).text
     soup = pyquery.PyQuery(re)
@@ -97,8 +97,11 @@ def get_singer(name, singer_url):
     session.commit()
 
 
-get_board(2018, 14)
+def schedule():
+    for year in range(15):
+        for i in range(0, 54):
+            print(2018 - year, 54 - i)
+            get_board(2018 - year, 54 - i)
 
 
-
-#get_info('112140')
+schedule()
