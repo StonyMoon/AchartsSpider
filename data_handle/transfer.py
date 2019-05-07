@@ -47,4 +47,5 @@ for each in songs:
         s = api_session.query(ApiSinger).filter_by(name=ss.name, area=ss.area, type=ss.type, born=ss.born).first()
         each.singers.append(s)
         api_session.add(each)
+        print(each)
 api_session.commit()

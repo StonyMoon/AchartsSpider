@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-DB_CONNECT_STRING = 'mysql+pymysql://root:root@localhost/cache_dev?charset=utf8'
+DB_CONNECT_STRING = 'mysql+pymysql://root:root@localhost/bboard?charset=utf8'
 engine = create_engine(DB_CONNECT_STRING, echo=False)
 DB_Session = sessionmaker(bind=engine)
 session = DB_Session()

@@ -121,4 +121,4 @@ def get_singer(name, singer_url):
 
 
 # schedule()
-get_board(2018, 44)
+get_board(2019, 15)
