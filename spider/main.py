@@ -121,4 +121,6 @@ def get_singer(name, singer_url):
 
 
 # schedule()
-get_board(2019, 15)
+# get_board(2019, 22)
+
+get_song_info('111403','King\'s Dead')
