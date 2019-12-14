@@ -74,7 +74,7 @@ def get_board(year, week):
 
         get_song_info(song_id, song_name)
     print(next_year, next_week)
-    get_board(next_year, next_week)
+    # get_board(next_year, next_week)
 
 
 def get_singer(name, singer_url):
@@ -113,6 +113,17 @@ def get_singer(name, singer_url):
     session.commit()
 
 
+def get_new_week():
+    url = 'https://acharts.co/us_singles_top_100'
+    re = get(url)
+    soup = pyquery.PyQuery(re)
+    page = soup('#st-container > div > div > header > div.title > h2:nth-child(3) > span').text() \
+        .replace('week', '').replace('(', '').replace(')', '').split('/')
+    print(page)
+    week = int(page[0])
+    year = int(page[1]) + 2000
+    return year, week
+
 # def schedule():
 #     for year in range(15):
 #         for i in range(0, 54):
@@ -121,6 +132,8 @@ def get_singer(name, singer_url):
 
 
 # schedule()
-# get_board(2019, 22)
+# get_board(2019, 49)
 
-get_song_info('111403','King\'s Dead')
+# get_song_info('111403','King\'s Dead')
+
+# get_new_week()

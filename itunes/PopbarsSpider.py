@@ -93,7 +93,8 @@ def get_response():
         else:
             response += each
             flag = True
-    response = u'{\"all_song\":[' + response + ']}'
+
+    response = u'{\"all_song\":[' + response + '],\"time\":}'
     return response
 
 

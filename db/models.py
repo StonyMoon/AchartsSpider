@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-DB_CONNECT_STRING = 'mysql+pymysql://root:root@localhost/bboard?charset=utf8'
+DB_CONNECT_STRING = 'mysql+pymysql://root:chunxiaoqianhe@localhost:3306/bboard?charset=utf8'
 engine = create_engine(DB_CONNECT_STRING, echo=False)
 DB_Session = sessionmaker(bind=engine)
 session = DB_Session()
@@ -28,12 +28,22 @@ class Billboard(Base):
         self.rank = rank
         self.date = date
 
-
     previous = Column(Integer)
     weeks = Column(Integer)
     peak = Column(Integer)
     rank = Column(Integer, primary_key=True, nullable=False)
     date = Column(DateTime, primary_key=True, nullable=False)
+
+
+class Chart(Base):
+    def __init__(self, year, week):
+        self.year = year
+        self.week = week
+
+    __tablename__ = 'chart'
+    id = Column(Integer, primary_key=True)
+    year = Column(Integer)
+    week = Column(Integer)
 
 
 class Singer(Base):

@@ -12,7 +12,6 @@ for each in songs:
 api_session.commit()
 
 
-
 singers = session.query(Singer).all()
 for each in singers:
     api_singer = api_session.query(ApiSinger).filter_by(id=each.id).first()
