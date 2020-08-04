@@ -59,7 +59,7 @@ def initSong(item, po):
 
 
 def open_url(url):
-    r = requests.get(url)
+    r = requests.get(url, timeout=5)
     return pq(r.text)
 
 
