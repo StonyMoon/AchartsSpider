@@ -12,7 +12,7 @@ def get(url, try_time=2):
         "User-Agent": "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"
     }
     try:
-        re = requests.get(url, headers=headers)
+        re = requests.get(url, headers=headers, timeout=5)
     except Exception:
         if try_time > 0:
             return get(url, try_time - 1)
