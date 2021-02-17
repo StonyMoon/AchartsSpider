@@ -7,7 +7,7 @@ from db.api_models import *
 from db.models import Chart, session as md_session
 from data_handle.transfer import reimport
 from spider.main import get_board, get_new_week
-
+from sqlalchemy import and_
 
 def delete_table():
     session.execute("delete from song_singer")
@@ -19,7 +19,7 @@ def delete_table():
 
 def get_next_week():
     year, week = get_new_week()
-    chart = md_session.query(Chart).filter(Chart.week == week and Chart.year == year).first()
+    chart = md_session.query(Chart).filter(and_(Chart.week , Chart.year == year)).first()
     print(week, year)
     print(chart)
     if chart is not None:
